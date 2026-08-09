@@ -24,7 +24,7 @@ export default function MockCheckout({ token }: { token: string }) {
       if (outcome === "success" && json.receiptUrl) {
         window.location.href = `/thank-you?receipt=${encodeURIComponent(json.receiptUrl)}`;
       } else {
-        window.location.href = "/";
+        window.location.href = "/thank-you?status=failed";
       }
     } catch {
       setError("Network error — please try again.");

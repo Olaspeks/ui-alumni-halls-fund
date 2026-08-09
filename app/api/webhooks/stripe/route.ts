@@ -21,7 +21,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid signature" }, { status: 401 });
   }
 
-  if (event.type !== "checkout.session.completed") {
+  // checkout.session.expired fires when a donor abandons Stripe's
+  // checkout page and the session times out (24h by default) — without
+  // handling it, an abandoned payment would leave a donation stuck as
+  // "pending" forever instead of resolving to a clear failed state.
+  if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.expired") {
     return NextResponse.json({ received: true });
   }
 
@@ -41,6 +45,11 @@ export async function POST(req: NextRequest) {
 
   if (error || !donation) {
     console.warn("[webhooks/stripe] no matching donation for reference", reference);
+    return NextResponse.json({ received: true });
+  }
+
+  if (event.type === "checkout.session.expired") {
+    await admin.from("donations").update({ status: "failed" }).eq("id", donation.id).eq("status", "pending");
     return NextResponse.json({ received: true });
   }
 

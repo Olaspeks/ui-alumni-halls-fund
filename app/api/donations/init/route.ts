@@ -4,7 +4,8 @@ import { checkRateLimit } from "@/lib/rateLimit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { clampDonationAmount, majorToSubunits } from "@/lib/money";
 import { findStaticHallBySlug } from "@/lib/halls";
-import { isSupabaseAdminConfigured, isPaystackConfigured, isStripeConfigured, siteUrl } from "@/lib/config";
+import { isSupabaseAdminConfigured, isPaystackConfigured, isStripeConfigured } from "@/lib/config";
+import { resolveBaseUrl } from "@/lib/requestUrl";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { initPaystackTransaction } from "@/lib/payments/paystack";
 import { initStripeCheckout } from "@/lib/payments/stripe";
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
   const amountSubunits = clampDonationAmount(majorToSubunits(input.amountMajor), input.currency);
   const donorName = input.isAnonymous ? null : input.donorName?.trim() || null;
   const reference = generateRef("ui");
+  const baseUrl = resolveBaseUrl();
 
   // ---------------------------------------------------------------
   // Mode A: Supabase (the database of record) isn't configured.
@@ -137,7 +139,7 @@ export async function POST(req: NextRequest) {
         currency: "NGN",
         email: input.donorEmail,
         reference,
-        callbackUrl: `${siteUrl}/thank-you?donation=${donation.id}`,
+        callbackUrl: `${baseUrl}/thank-you?donation=${donation.id}`,
         metadata: { hallName: hall.name, hallSlug: hall.slug, donationId: donation.id },
       });
       return NextResponse.json({ checkoutUrl: result.checkoutUrl });
@@ -148,11 +150,11 @@ export async function POST(req: NextRequest) {
           currency: "USD",
           email: input.donorEmail,
           reference,
-          callbackUrl: `${siteUrl}/thank-you?donation=${donation.id}`,
+          callbackUrl: `${baseUrl}/thank-you?donation=${donation.id}`,
           metadata: { hallName: hall.name, hallSlug: hall.slug, donationId: donation.id },
         },
-        `${siteUrl}/thank-you?donation=${donation.id}`,
-        `${siteUrl}/#${hall.slug}`,
+        `${baseUrl}/thank-you?donation=${donation.id}`,
+        `${baseUrl}/#${hall.slug}`,
       );
       return NextResponse.json({ checkoutUrl: result.checkoutUrl });
     }

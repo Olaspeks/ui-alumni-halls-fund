@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { siteUrl } from "@/lib/config";
+import { resolveBaseUrl } from "@/lib/requestUrl";
 
 /**
  * Lets the /thank-you page poll "has the webhook landed yet?" without
@@ -21,6 +21,6 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     status: data.status,
-    receiptUrl: data.status === "success" ? `${siteUrl}/receipt/${data.receipt_token}` : null,
+    receiptUrl: data.status === "success" ? `${resolveBaseUrl()}/receipt/${data.receipt_token}` : null,
   });
 }

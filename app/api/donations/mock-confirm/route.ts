@@ -3,7 +3,7 @@ import { mockConfirmSchema } from "@/lib/validation";
 import { isMockToken, decodeMockToken, encodeMockToken } from "@/lib/receiptToken";
 import { sendReceiptEmail } from "@/lib/email/resend";
 import { stampConfirmation } from "@/lib/blockchain/stamp";
-import { siteUrl } from "@/lib/config";
+import { resolveBaseUrl } from "@/lib/requestUrl";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { finalizeDonationSuccess } from "@/lib/donations";
 
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const finalPayload = { ...payload, status: "success" as const };
     const receiptToken = encodeMockToken(finalPayload);
-    const receiptUrl = `${siteUrl}/receipt/${receiptToken}`;
+    const receiptUrl = `${resolveBaseUrl()}/receipt/${receiptToken}`;
 
     await sendReceiptEmail(payload.donorEmail, {
       donorDisplayName: payload.donorName?.trim() || "Friend of UI",

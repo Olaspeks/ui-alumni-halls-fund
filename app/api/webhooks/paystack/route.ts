@@ -22,8 +22,10 @@ export async function POST(req: NextRequest) {
 
   const event = JSON.parse(rawBody) as PaystackWebhookEvent;
 
-  if (event.event !== "charge.success") {
-    // Acknowledge and ignore anything we don't act on (refunds, etc).
+  // Anything besides success/failure (refunds, transfers, etc.) is
+  // acknowledged and ignored — we only act on the two outcomes that
+  // affect a donation's status.
+  if (event.event !== "charge.success" && event.event !== "charge.failed") {
     return NextResponse.json({ received: true });
   }
 
@@ -36,6 +38,15 @@ export async function POST(req: NextRequest) {
 
   if (error || !donation) {
     console.warn("[webhooks/paystack] no matching donation for reference", event.data.reference);
+    return NextResponse.json({ received: true });
+  }
+
+  if (event.event === "charge.failed") {
+    // Leaves already-success donations alone; only a still-pending one
+    // (a genuinely declined/abandoned charge) gets marked failed, so a
+    // donor's /thank-you page resolves to a clear outcome instead of
+    // polling forever — see app/thank-you/PendingConfirmation.tsx.
+    await admin.from("donations").update({ status: "failed" }).eq("id", donation.id).eq("status", "pending");
     return NextResponse.json({ received: true });
   }
 

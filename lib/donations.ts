@@ -2,7 +2,7 @@ import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendReceiptEmail } from "@/lib/email/resend";
 import { stampConfirmation } from "@/lib/blockchain/stamp";
-import { siteUrl } from "@/lib/config";
+import { resolveBaseUrl } from "@/lib/requestUrl";
 import type { Hall } from "@/types/database";
 
 /**
@@ -28,7 +28,7 @@ export async function finalizeDonationSuccess(
 
   if (fetchErr || !existing) return { ok: false, error: "donation not found" };
 
-  const receiptUrl = `${siteUrl}/receipt/${existing.receipt_token}`;
+  const receiptUrl = `${resolveBaseUrl()}/receipt/${existing.receipt_token}`;
 
   if (existing.status === "success") {
     // Already processed — webhook retries are expected, just no-op.

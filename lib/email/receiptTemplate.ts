@@ -1,5 +1,4 @@
 import { formatMoney, type Currency } from "@/lib/money";
-import { siteUrl } from "@/lib/config";
 
 export interface ReceiptEmailData {
   donorDisplayName: string; // real name even if publicly anonymous
@@ -25,6 +24,10 @@ export function renderReceiptEmailHtml(data: ReceiptEmailData): string {
     timeStyle: "short",
   });
   const amountFormatted = formatMoney(data.amount, data.currency);
+  // Derived from the already-resolved receipt URL rather than importing
+  // a separate base-url source — keeps this a pure function and can't
+  // drift out of sync with whatever domain actually served the request.
+  const origin = new URL(data.receiptUrl).origin;
 
   return `<!doctype html>
 <html>
@@ -66,7 +69,7 @@ export function renderReceiptEmailHtml(data: ReceiptEmailData): string {
 
           <p style="font-size:13px;line-height:1.6;color:#5B5F72;">
             You can also see ${escapeHtml(data.hallName)}'s renovation progress at any time:
-            <a href="${siteUrl}/#${data.hallSlug}" style="color:${INDIGO};">${siteUrl}/#${data.hallSlug}</a>
+            <a href="${origin}/#${data.hallSlug}" style="color:${INDIGO};">${origin}/#${data.hallSlug}</a>
           </p>
         </td>
       </tr>
