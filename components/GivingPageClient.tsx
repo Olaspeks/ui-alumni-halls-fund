@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { Hall } from "@/types/database";
 import type { Currency } from "@/lib/money";
 import { formatMoney, percentRaised, convertSubunits } from "@/lib/money";
 import type { FxRate } from "@/lib/fx";
 import { useHallsRealtime } from "@/hooks/useHallsRealtime";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import Gauge from "./Gauge";
 import HallCard from "./HallCard";
 
@@ -20,6 +22,7 @@ export default function GivingPageClient({
 }) {
   const halls = useHallsRealtime(initialHalls);
   const [heroCurrency, setHeroCurrency] = useState<Currency>("NGN");
+  const { loading: authLoading, email } = useAuthUser();
 
   // Combined total: every hall's NGN gifts + every hall's USD gifts,
   // converted live into whichever currency is selected, so switching
@@ -84,6 +87,23 @@ export default function GivingPageClient({
               <p className="mt-6 font-mono text-sm text-indigo-200">
                 {formatMoney(totalRaised, heroCurrency)} raised of {formatMoney(totalGoal, heroCurrency)} combined goal
               </p>
+
+              {!authLoading && !email && (
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <Link
+                    href="/login?mode=signup"
+                    className="bg-gold-500 px-6 py-3 text-sm font-semibold text-indigo-950 shadow-raised transition-colors hover:bg-gold-400"
+                  >
+                    Create an account
+                  </Link>
+                  <Link
+                    href="/login?mode=signin"
+                    className="bg-indigo-100 px-6 py-3 text-sm font-semibold text-indigo-950 transition-colors hover:bg-white"
+                  >
+                    Sign in
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

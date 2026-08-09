@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, siteUrl } from "@/lib/config";
+import MockAuthForm from "./MockAuthForm";
 
 type Tab = "magic" | "password";
 type PasswordMode = "signin" | "signup" | "forgot";
@@ -12,15 +13,19 @@ type PasswordMode = "signin" | "signup" | "forgot";
  * prominent (the recommended default per the brief); email+password is
  * offered as the alternative, in its own tab, with confirm/resend/forgot
  * all covered. Guests never see this screen — it's opt-in only.
+ *
+ * `initialMode` lets a caller (the homepage's Sign up / Sign in buttons)
+ * land the visitor on the right starting tab instead of always the
+ * default. When Supabase isn't configured yet, this renders
+ * MockAuthForm instead — same fields, same shape of flow, no backend.
  */
-export default function AuthForm() {
-  const [tab, setTab] = useState<Tab>("magic");
+export default function AuthForm({ initialMode }: { initialMode?: "signin" | "signup" }) {
+  const [tab, setTab] = useState<Tab>(initialMode === "signup" ? "password" : "magic");
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="border border-indigo-100 bg-white p-6 text-sm text-ink-500">
-        Accounts aren&apos;t available yet — this demo is running without a connected
-        Supabase project. You can still give as a guest from the home page.
+      <div className="border border-indigo-100 bg-white p-6">
+        <MockAuthForm initialMode={initialMode ?? "signin"} />
       </div>
     );
   }
@@ -35,7 +40,9 @@ export default function AuthForm() {
           Email &amp; password
         </TabButton>
       </div>
-      <div className="p-6">{tab === "magic" ? <MagicLinkForm /> : <PasswordForm />}</div>
+      <div className="p-6">
+        {tab === "magic" ? <MagicLinkForm /> : <PasswordForm initialMode={initialMode === "signup" ? "signup" : "signin"} />}
+      </div>
     </div>
   );
 }
@@ -139,8 +146,8 @@ function MagicLinkForm() {
   );
 }
 
-function PasswordForm() {
-  const [mode, setMode] = useState<PasswordMode>("signin");
+function PasswordForm({ initialMode = "signin" }: { initialMode?: PasswordMode }) {
+  const [mode, setMode] = useState<PasswordMode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
