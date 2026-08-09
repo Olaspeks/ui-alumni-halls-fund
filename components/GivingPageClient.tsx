@@ -29,8 +29,11 @@ export default function GivingPageClient({ initialHalls, live }: { initialHalls:
         <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
           <div className="grid items-center gap-10 sm:grid-cols-[auto_1fr]">
             <div className="flex flex-col items-center">
-              <Gauge percent={percent} size="lg" centerLabel="raised" />
-              <div className="mt-3 inline-flex border border-indigo-700 text-xs">
+              <Gauge percent={percent} size="lg" centerLabel="grand total raised" />
+              <div
+                className="mt-3 inline-flex border border-indigo-700 text-xs"
+                title="Naira and Dollar totals are tracked separately — this switches which one you're viewing, it does not convert between them."
+              >
                 {(["NGN", "USD"] as const).map((c) => (
                   <button
                     key={c}
@@ -43,6 +46,9 @@ export default function GivingPageClient({ initialHalls, live }: { initialHalls:
                   </button>
                 ))}
               </div>
+              <p className="mt-2 max-w-[220px] text-center text-[11px] leading-snug text-indigo-300">
+                Naira and Dollar gifts are tracked separately, never converted — this switches which total you&apos;re viewing.
+              </p>
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-gold-300">

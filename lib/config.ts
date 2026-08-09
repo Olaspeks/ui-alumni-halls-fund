@@ -44,5 +44,10 @@ export const receiptTokenSecret =
 export const chainExplorerTxBaseUrl =
   process.env.CHAIN_EXPLORER_TX_BASE_URL || "https://amoy.polygonscan.com/tx/";
 
+/** Deliberately falls back to a reserved .example address (RFC 2606) —
+ * never a real-looking inbox nobody is actually monitoring. Set
+ * NEXT_PUBLIC_SUPPORT_EMAIL before sending anyone to /support for real. */
+export const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@ui-alumni-halls-fund.example";
+
 /** True combined "does giving require a real payment provider" check. */
 export const anyPaymentProviderConfigured = isPaystackConfigured || isStripeConfigured;

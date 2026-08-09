@@ -27,7 +27,10 @@ export default function HallCard({ hall }: { hall: Hall }) {
             </span>
           )}
         </div>
-        <div className="inline-flex shrink-0 border border-indigo-200 text-xs">
+        <div
+          className="inline-flex shrink-0 border border-indigo-200 text-xs"
+          title="Naira and Dollar totals are separate, not converted — this switches which one is shown."
+        >
           {(["NGN", "USD"] as const).map((c) => (
             <button
               key={c}

@@ -9,10 +9,21 @@ export default function SiteHeader() {
   return (
     <header className="border-b border-indigo-100 bg-indigo-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link href="/" className="flex flex-col leading-none">
-          <span className="text-[10px] font-medium uppercase tracking-widest text-gold-700">University of Ibadan</span>
-          <span className="font-serif text-lg text-indigo-950">Alumni Halls Fund</span>
-        </Link>
+        <div className="flex flex-col leading-none">
+          {/* Goes to the real university site, not this app — deliberately
+              a separate link from the wordmark below it. */}
+          <a
+            href="https://ui.edu.ng"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] font-medium uppercase tracking-widest text-gold-700 hover:underline"
+          >
+            University of Ibadan
+          </a>
+          <Link href="/" className="font-serif text-lg text-indigo-950">
+            Alumni Halls Fund
+          </Link>
+        </div>
 
         <nav className="flex items-center gap-5 text-sm">
           {!loading && !email && (
