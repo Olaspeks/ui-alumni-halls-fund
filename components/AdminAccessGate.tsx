@@ -57,7 +57,7 @@ export default function AdminAccessGate() {
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Dean Adeyemi"
+                placeholder="e.g. Dean Lewis"
                 className="w-full border border-indigo-700 bg-indigo-900/60 px-3 py-2.5 text-sm text-white outline-none placeholder:text-indigo-500 focus:border-gold-500"
               />
             </label>
