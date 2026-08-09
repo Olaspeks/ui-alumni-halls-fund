@@ -53,3 +53,14 @@ export function percentRaised(raised: number, goal: number): number {
   if (goal <= 0) return 0;
   return Math.min(100, Math.round((raised / goal) * 1000) / 10);
 }
+
+/**
+ * Converts a subunit amount between NGN and USD using a supplied live
+ * rate (see lib/fx.ts). Display-only — see lib/fx.ts's module comment
+ * for why this never touches stored/accounted amounts.
+ */
+export function convertSubunits(amountSubunits: number, from: Currency, to: Currency, usdToNgnRate: number): number {
+  if (from === to) return amountSubunits;
+  if (from === "USD" && to === "NGN") return Math.round(amountSubunits * usdToNgnRate);
+  return Math.round(amountSubunits / usdToNgnRate); // NGN -> USD
+}

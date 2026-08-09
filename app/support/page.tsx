@@ -32,7 +32,7 @@ const FAQS: { q: string; a: string }[] = [
 
 export default function SupportPage() {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
+    <main className="support-page-scope mx-auto max-w-2xl px-4 py-12 sm:py-16">
       <p className="text-[11px] font-medium uppercase tracking-widest text-gold-700">We&apos;re here to help</p>
       <h1 className="mt-1 font-serif text-3xl text-indigo-950 sm:text-4xl">Support &amp; FAQ</h1>
       <p className="mt-3 text-sm text-ink-500">

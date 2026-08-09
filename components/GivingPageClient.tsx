@@ -3,23 +3,45 @@
 import { useMemo, useState } from "react";
 import type { Hall } from "@/types/database";
 import type { Currency } from "@/lib/money";
-import { formatMoney, percentRaised } from "@/lib/money";
+import { formatMoney, percentRaised, convertSubunits } from "@/lib/money";
+import type { FxRate } from "@/lib/fx";
 import { useHallsRealtime } from "@/hooks/useHallsRealtime";
 import Gauge from "./Gauge";
 import HallCard from "./HallCard";
 
-export default function GivingPageClient({ initialHalls, live }: { initialHalls: Hall[]; live: boolean }) {
+export default function GivingPageClient({
+  initialHalls,
+  live,
+  fxRate,
+}: {
+  initialHalls: Hall[];
+  live: boolean;
+  fxRate: FxRate;
+}) {
   const halls = useHallsRealtime(initialHalls);
   const [heroCurrency, setHeroCurrency] = useState<Currency>("NGN");
 
+  // Combined total: every hall's NGN gifts + every hall's USD gifts,
+  // converted live into whichever currency is selected, so switching
+  // ₦/$ always shows the same underlying money — just expressed in a
+  // different currency, not a separate pool of it.
   const { totalRaised, totalGoal } = useMemo(() => {
-    const key = heroCurrency === "NGN" ? ("raised_kobo" as const) : ("raised_cents" as const);
-    const goalKey = heroCurrency === "NGN" ? ("goal_kobo" as const) : ("goal_cents" as const);
+    const rawRaisedNgn = halls.reduce((sum, h) => sum + h.raised_kobo, 0);
+    const rawRaisedUsd = halls.reduce((sum, h) => sum + h.raised_cents, 0);
+    const rawGoalNgn = halls.reduce((sum, h) => sum + h.goal_kobo, 0);
+    const rawGoalUsd = halls.reduce((sum, h) => sum + h.goal_cents, 0);
+
+    if (heroCurrency === "NGN") {
+      return {
+        totalRaised: rawRaisedNgn + convertSubunits(rawRaisedUsd, "USD", "NGN", fxRate.usdToNgn),
+        totalGoal: rawGoalNgn + convertSubunits(rawGoalUsd, "USD", "NGN", fxRate.usdToNgn),
+      };
+    }
     return {
-      totalRaised: halls.reduce((sum, h) => sum + h[key], 0),
-      totalGoal: halls.reduce((sum, h) => sum + h[goalKey], 0),
+      totalRaised: rawRaisedUsd + convertSubunits(rawRaisedNgn, "NGN", "USD", fxRate.usdToNgn),
+      totalGoal: rawGoalUsd + convertSubunits(rawGoalNgn, "NGN", "USD", fxRate.usdToNgn),
     };
-  }, [halls, heroCurrency]);
+  }, [halls, heroCurrency, fxRate]);
 
   const percent = percentRaised(totalRaised, totalGoal);
 
@@ -30,10 +52,7 @@ export default function GivingPageClient({ initialHalls, live }: { initialHalls:
           <div className="grid items-center gap-10 sm:grid-cols-[auto_1fr]">
             <div className="flex flex-col items-center">
               <Gauge percent={percent} size="lg" centerLabel="grand total raised" />
-              <div
-                className="mt-3 inline-flex border border-indigo-700 text-xs"
-                title="Naira and Dollar totals are tracked separately — this switches which one you're viewing, it does not convert between them."
-              >
+              <div className="mt-3 inline-flex border border-indigo-700 text-xs">
                 {(["NGN", "USD"] as const).map((c) => (
                   <button
                     key={c}
@@ -46,8 +65,8 @@ export default function GivingPageClient({ initialHalls, live }: { initialHalls:
                   </button>
                 ))}
               </div>
-              <p className="mt-2 max-w-[220px] text-center text-[11px] leading-snug text-indigo-300">
-                Naira and Dollar gifts are tracked separately, never converted — this switches which total you&apos;re viewing.
+              <p className="mt-2 font-mono text-[11px] text-indigo-400">
+                $1 ≈ ₦{Math.round(fxRate.usdToNgn).toLocaleString()} · live rate
               </p>
             </div>
             <div>
@@ -74,7 +93,7 @@ export default function GivingPageClient({ initialHalls, live }: { initialHalls:
         <h2 className="mb-6 font-serif text-2xl text-indigo-950">All 15 halls</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {halls.map((hall) => (
-            <HallCard key={hall.id} hall={hall} />
+            <HallCard key={hall.id} hall={hall} fxRate={fxRate} />
           ))}
         </div>
       </section>

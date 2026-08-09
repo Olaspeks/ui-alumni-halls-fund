@@ -41,6 +41,38 @@
   }
 }
 
+/*
+ * Site-wide font-size increase, everywhere except /support.
+ *
+ * Deliberately plain CSS (not @layer) so it wins over Tailwind's own
+ * utility layer regardless of source order — unlayered rules always
+ * beat layered ones. Each step is Tailwind's default size bumped up
+ * roughly one notch. To opt an area back out (as /support does), wrap
+ * it in `.support-page-scope` — see the reset block right after this
+ * one, which wins via selector specificity, not layering.
+ */
+.text-xs { font-size: 0.875rem; line-height: 1.125rem; }
+.text-sm { font-size: 1rem; line-height: 1.375rem; }
+.text-base { font-size: 1.125rem; line-height: 1.625rem; }
+.text-lg { font-size: 1.25rem; line-height: 1.875rem; }
+.text-xl { font-size: 1.375rem; line-height: 1.875rem; }
+.text-2xl { font-size: 1.75rem; line-height: 2.25rem; }
+.text-3xl { font-size: 2.125rem; line-height: 2.5rem; }
+.text-4xl { font-size: 2.625rem; line-height: 2.875rem; }
+.text-5xl { font-size: 3.375rem; line-height: 1; }
+
+/* /support opts out of the boost above and stays at Tailwind's normal
+   scale — two-class selectors here outrank the single-class rules above. */
+.support-page-scope .text-xs { font-size: 0.75rem; line-height: 1rem; }
+.support-page-scope .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.support-page-scope .text-base { font-size: 1rem; line-height: 1.5rem; }
+.support-page-scope .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.support-page-scope .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.support-page-scope .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.support-page-scope .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.support-page-scope .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.support-page-scope .text-5xl { font-size: 3rem; line-height: 1; }
+
 /* Print stylesheet for receipts — clean, ink-friendly, no chrome. */
 @media print {
   header,

@@ -1,20 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Hall } from "@/types/database";
 import type { Currency } from "@/lib/money";
-import { formatMoney, percentRaised } from "@/lib/money";
-import { hallTotals } from "@/types/database";
+import { formatMoney, percentRaised, convertSubunits } from "@/lib/money";
+import type { FxRate } from "@/lib/fx";
 import Gauge from "./Gauge";
 import VerifyOnChainLink from "./VerifyOnChainLink";
 import DonationDialog from "./DonationDialog";
 
-export default function HallCard({ hall }: { hall: Hall }) {
+export default function HallCard({ hall, fxRate }: { hall: Hall; fxRate: FxRate }) {
   const [currency, setCurrency] = useState<Currency>("NGN");
   const [open, setOpen] = useState(false);
-  const { goal, raised } = hallTotals(hall, currency);
-  const percent = percentRaised(raised, goal);
   const txHash = currency === "NGN" ? hall.onchain_ngn_tx_hash : hall.onchain_usd_tx_hash;
+
+  // Combined, currency-equivalent figures: this hall's NGN gifts + its
+  // USD gifts, converted live into whichever currency is selected — the
+  // toggle switches how you're viewing the same total, not which pool
+  // of money you're looking at.
+  const { raised, goal } = useMemo(() => {
+    if (currency === "NGN") {
+      return {
+        raised: hall.raised_kobo + convertSubunits(hall.raised_cents, "USD", "NGN", fxRate.usdToNgn),
+        goal: hall.goal_kobo + convertSubunits(hall.goal_cents, "USD", "NGN", fxRate.usdToNgn),
+      };
+    }
+    return {
+      raised: hall.raised_cents + convertSubunits(hall.raised_kobo, "NGN", "USD", fxRate.usdToNgn),
+      goal: hall.goal_cents + convertSubunits(hall.goal_kobo, "NGN", "USD", fxRate.usdToNgn),
+    };
+  }, [hall, currency, fxRate]);
+
+  const percent = percentRaised(raised, goal);
 
   return (
     <div id={hall.slug} className="flex flex-col border border-indigo-100 bg-white p-5 shadow-card scroll-mt-24">
@@ -27,10 +44,7 @@ export default function HallCard({ hall }: { hall: Hall }) {
             </span>
           )}
         </div>
-        <div
-          className="inline-flex shrink-0 border border-indigo-200 text-xs"
-          title="Naira and Dollar totals are separate, not converted — this switches which one is shown."
-        >
+        <div className="inline-flex shrink-0 border border-indigo-200 text-xs">
           {(["NGN", "USD"] as const).map((c) => (
             <button
               key={c}

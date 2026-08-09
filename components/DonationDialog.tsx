@@ -87,10 +87,6 @@ export default function DonationDialog({ hall, onClose }: { hall: Hall; onClose:
                 </button>
               ))}
             </div>
-            <p className="mt-1.5 text-[11px] text-ink-300">
-              This is the actual currency of your gift, tracked toward its own separate goal — not converted from
-              the other.
-            </p>
           </div>
 
           <div>
