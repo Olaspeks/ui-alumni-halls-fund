@@ -8,9 +8,14 @@ export default function SiteFooter() {
           <p>UI Alumni Halls Fund — an independent giving platform for University of Ibadan alumni.</p>
           <p className="mt-1">Every confirmed hall total is stamped on a public blockchain ledger for independent verification.</p>
         </div>
-        <Link href="/support" className="shrink-0 font-medium text-indigo-900 underline decoration-gold-500 underline-offset-2">
-          Support &amp; FAQ
-        </Link>
+        <div className="flex shrink-0 gap-4">
+          <Link href="/admin/login" className="font-medium text-indigo-900 underline decoration-gold-500 underline-offset-2">
+            Staff &amp; finance
+          </Link>
+          <Link href="/support" className="font-medium text-indigo-900 underline decoration-gold-500 underline-offset-2">
+            Support &amp; FAQ
+          </Link>
+        </div>
       </div>
     </footer>
   );

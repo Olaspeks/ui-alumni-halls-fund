@@ -57,6 +57,14 @@ export default function MockAuthForm({ initialMode = "signin" }: { initialMode?:
 
   if (stage === "done") {
     const firstName = fullName.trim().split(" ")[0];
+    // Sign-up: back to the homepage (per the original ask — nothing to
+    // show yet right after "registering"). Sign-in: straight into the
+    // alumni account preview, since that's the point of signing in.
+    // Carries the typed name along if there was one; MockAccountView
+    // falls back to "Bowie" when there isn't.
+    if (fullName.trim()) window.sessionStorage.setItem("mockDonorName", fullName.trim());
+    const destination = mode === "signup" ? "/" : "/account";
+
     return (
       <div className="space-y-4 py-2 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-100 text-2xl">
@@ -72,10 +80,10 @@ export default function MockAuthForm({ initialMode = "signin" }: { initialMode?:
           Real accounts go live once Supabase is connected — nothing was actually created just now.
         </p>
         <button
-          onClick={() => (window.location.href = "/")}
+          onClick={() => (window.location.href = destination)}
           className="w-full bg-indigo-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
         >
-          Continue to homepage
+          {mode === "signup" ? "Continue to homepage" : "Continue to your account"}
         </button>
       </div>
     );

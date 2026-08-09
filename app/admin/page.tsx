@@ -3,19 +3,14 @@ import { requireRole } from "@/lib/auth/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/config";
 import AdminDashboard, { type DonationRow, type FundMovementRow } from "@/components/AdminDashboard";
+import AdminCommandCenter from "@/components/AdminCommandCenter";
 
 export default async function AdminPage() {
-  if (!isSupabaseConfigured) {
-    return (
-      <main className="mx-auto max-w-lg px-4 py-16 text-center">
-        <h1 className="font-serif text-2xl text-indigo-950">Admin isn&apos;t available yet</h1>
-        <p className="mt-3 text-sm text-ink-500">
-          This demo is running without a connected Supabase project, so there are no real
-          logins to check. Connect Supabase (see the README) to unlock /admin.
-        </p>
-      </main>
-    );
-  }
+  // Mock mode: no real logins to check yet, so show the "Command Center"
+  // preview (fabricated data) instead of a real dashboard. Reached
+  // normally via the themed entrance at /admin/login, but works fine
+  // landed on directly too — just without the "Welcome, {name}" cinematic.
+  if (!isSupabaseConfigured) return <AdminCommandCenter />;
 
   const session = await requireRole("staff_admin", "finance_admin");
   if (!session) redirect("/login?next=/admin");

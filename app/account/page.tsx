@@ -3,9 +3,16 @@ import Link from "next/link";
 import { getSessionProfile } from "@/lib/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
+import { isSupabaseConfigured } from "@/lib/config";
 import StatusBadge from "@/components/StatusBadge";
+import MockAccountView from "@/components/MockAccountView";
 
 export default async function AccountPage() {
+  // Mock mode: there's no real session to check, so /login's mock
+  // sign-in sends visitors straight here to preview the alumni POV
+  // instead of bouncing them through a login gate that can't work yet.
+  if (!isSupabaseConfigured) return <MockAccountView />;
+
   const session = await getSessionProfile();
   if (!session) redirect("/login?next=/account");
 
