@@ -27,6 +27,20 @@ export function formatMoney(subunits: number, currency: Currency): string {
   return `${CURRENCY_SYMBOL[currency]}${formatted}`;
 }
 
+/** Compact form for tight spaces (e.g. "₦1.4M", "$8.8K") — the
+ * barometer array's tube labels have room for a figure, not a sentence. */
+export function formatMoneyShort(subunits: number, currency: Currency): string {
+  const major = subunits / 100;
+  const symbol = CURRENCY_SYMBOL[currency];
+  if (major >= 1_000_000) return `${symbol}${trimZero((major / 1_000_000).toFixed(1))}M`;
+  if (major >= 1_000) return `${symbol}${trimZero((major / 1_000).toFixed(1))}K`;
+  return `${symbol}${Math.round(major)}`;
+}
+
+function trimZero(s: string): string {
+  return s.replace(/\.0$/, "");
+}
+
 /** Format for the monospace currency figures (no symbol, fixed width feel). */
 export function formatMoneyMono(subunits: number): string {
   return (subunits / 100).toLocaleString("en-US", {

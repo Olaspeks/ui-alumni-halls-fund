@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function SiteHeader() {
@@ -9,20 +10,32 @@ export default function SiteHeader() {
   return (
     <header className="border-b border-indigo-100 bg-indigo-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <div className="flex flex-col leading-none">
-          {/* Goes to the real university site, not this app — deliberately
-              a separate link from the wordmark below it. */}
-          <a
-            href="https://ui.edu.ng"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] font-medium uppercase tracking-widest text-gold-700 hover:underline"
-          >
-            University of Ibadan
-          </a>
-          <Link href="/" className="font-serif text-lg text-indigo-950">
-            Alumni Halls Fund
-          </Link>
+        <div className="flex items-center gap-3">
+          {/* Official UI crest (includes the "Recte Sapere Fons" motto),
+              sourced from ui.edu.ng/content/anthems-and-ui-logo. */}
+          <Image
+            src="/brand/ui-crest.png"
+            alt="University of Ibadan crest"
+            width={170}
+            height={200}
+            className="h-11 w-auto shrink-0"
+            priority
+          />
+          <div className="flex flex-col leading-none">
+            {/* Goes to the real university site, not this app — deliberately
+                a separate link from the wordmark below it. */}
+            <a
+              href="https://ui.edu.ng"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] font-medium uppercase tracking-widest text-gold-700 hover:underline"
+            >
+              University of Ibadan
+            </a>
+            <Link href="/" className="font-serif text-lg text-indigo-950">
+              Alumni Halls Fund
+            </Link>
+          </div>
         </div>
 
         <nav className="flex items-center gap-5 text-sm">

@@ -115,10 +115,6 @@ links, so don't leave it as `localhost` in production.
 
 ## What still needs the Dean's sign-off before going fully live
 
-- **Two hall names.** UI's own Lodgings Unit page lists 12 official
-  halls; this build ships 13 confirmed real names plus 2 rows clearly
-  labeled `Hall 14/15 — confirm with Dean` to reach 15, per the brief.
-  No invented names were used for those two.
 - **Real fundraising goals per hall.** The goals currently in
   `supabase/schema.sql` (and the mock-mode fallback in `lib/halls.ts`)
   are placeholder figures — reasonable round numbers, not real budget

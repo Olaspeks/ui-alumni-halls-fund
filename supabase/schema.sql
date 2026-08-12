@@ -255,7 +255,7 @@ grant select on public.public_donations to anon, authenticated;
 alter publication supabase_realtime add table public.halls;
 
 -- =====================================================================
--- Seed: 15 halls (13 real, 2 explicitly flagged placeholders).
+-- Seed: all 15 halls, real confirmed names.
 -- Goals are placeholder figures — flagged in README as needing the
 -- Dean's sign-off before going live.
 -- =====================================================================
@@ -274,8 +274,8 @@ values
   ('Alexander Brown Hall', 'alexander-brown-hall', 'A postgraduate hall of residence.', 11, false, 400000000, 2400000),
   ('Idia Hall', 'idia-hall', 'A women''s hall of residence at UI.', 12, false, 500000000, 3000000),
   ('Abdulsalami Abubakar Hall', 'abdulsalami-abubakar-hall', 'Named for the former Nigerian head of state.', 13, false, 500000000, 3000000),
-  ('Hall 14 — confirm with Dean', 'hall-14-tbc', 'Placeholder row — real name pending confirmation from the Dean''s office.', 14, true, 400000000, 2400000),
-  ('Hall 15 — confirm with Dean', 'hall-15-tbc', 'Placeholder row — real name pending confirmation from the Dean''s office.', 15, true, 400000000, 2400000)
+  ('Ayodele Falase Hall', 'ayodele-falase-hall', 'A hall of residence at the University of Ibadan.', 14, false, 400000000, 2400000),
+  ('Adetoun Ogunsheye Hall', 'adetoun-ogunsheye-hall', 'A hall of residence at the University of Ibadan.', 15, false, 400000000, 2400000)
 on conflict (slug) do nothing;
 
 -- =====================================================================

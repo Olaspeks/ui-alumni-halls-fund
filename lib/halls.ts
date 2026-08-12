@@ -9,8 +9,7 @@ import type { Hall } from "@/types/database";
  * Supabase env vars are set; halls then come live from the `halls` table
  * instead, with real per-donation totals and realtime updates.
  *
- * 13 real, confirmed UI hall names + 2 explicitly flagged placeholders,
- * per the brief.
+ * All 15 real, confirmed UI hall names.
  */
 export const STATIC_HALLS: Hall[] = [
   mk("Mellanby Hall", "mellanby-hall", "One of UI's founding halls, home to generations of alumni.", 1, false, 5_000_000_00, 1_450_000_00, 30_000_00, 8_200_00),
@@ -26,8 +25,8 @@ export const STATIC_HALLS: Hall[] = [
   mk("Alexander Brown Hall", "alexander-brown-hall", "A postgraduate hall of residence.", 11, false, 4_000_000_00, 860_000_00, 24_000_00, 4_100_00),
   mk("Idia Hall", "idia-hall", "A women's hall of residence at UI.", 12, false, 5_000_000_00, 1_390_000_00, 30_000_00, 7_300_00),
   mk("Abdulsalami Abubakar Hall", "abdulsalami-abubakar-hall", "Named for the former Nigerian head of state.", 13, false, 5_000_000_00, 720_000_00, 30_000_00, 3_600_00),
-  mk("Hall 14 — confirm with Dean", "hall-14-tbc", "Placeholder row — real name pending confirmation from the Dean's office.", 14, true, 4_000_000_00, 310_000_00, 24_000_00, 1_800_00),
-  mk("Hall 15 — confirm with Dean", "hall-15-tbc", "Placeholder row — real name pending confirmation from the Dean's office.", 15, true, 4_000_000_00, 260_000_00, 24_000_00, 1_400_00),
+  mk("Ayodele Falase Hall", "ayodele-falase-hall", "A hall of residence at the University of Ibadan.", 14, false, 4_000_000_00, 310_000_00, 24_000_00, 1_800_00),
+  mk("Adetoun Ogunsheye Hall", "adetoun-ogunsheye-hall", "A hall of residence at the University of Ibadan.", 15, false, 4_000_000_00, 260_000_00, 24_000_00, 1_400_00),
 ];
 
 function mk(
