@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Hall } from "@/types/database";
 import { percentRaised, convertSubunits, type Currency } from "@/lib/money";
 import type { FxRate } from "@/lib/fx";
@@ -10,9 +10,16 @@ import DonationDialog from "./DonationDialog";
 /**
  * The instrument-panel-style barometer row — all 15 halls side by side
  * as liquid-fill tubes, reading as one connected instrument rather than
- * a grid of separate cards. Deliberately never wraps to a new line
- * (that breaks the at-a-glance comparison the Dean specifically asked
- * for) — it scrolls horizontally instead, on every screen size.
+ * a grid of separate cards.
+ *
+ * Layout: each tube is allowed to shrink (down to a legible floor) and
+ * grow (up to a sensible ceiling) to fill available width, so on most
+ * desktop/tablet widths all 15 are visible at once with no scrolling —
+ * see BarometerTube's flex-basis/min/max. Only once the row can't fit
+ * everyone at a readable size does it fall back to horizontal scroll,
+ * with edge-fades and small chevron buttons that appear only then (see
+ * the scroll-state tracking below) — never on a width where everything
+ * already fits.
  *
  * One shared currency toggle drives every tube at once (see
  * GivingPageClient), rather than each hall toggling independently —
@@ -28,6 +35,8 @@ export default function BarometerArray({
   fxRate: FxRate;
 }) {
   const [selectedHall, setSelectedHall] = useState<Hall | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scroll, setScroll] = useState({ overflowing: false, canLeft: false, canRight: false });
 
   const computed = useMemo(() => {
     const rows = halls.map((hall) => {
@@ -43,26 +52,107 @@ export default function BarometerArray({
             };
       return { hall, raised, goal, percent: percentRaised(raised, goal) };
     });
-    const maxPercent = Math.max(0, ...rows.map((r) => r.percent));
-    return { rows, maxPercent };
+
+    // Top 3 by percentage of goal reached — not raw amount, so a small
+    // hall close to its own target can outrank a larger hall further
+    // from its own. Only halls actually making progress get ranked.
+    const rankedIds = [...rows]
+      .filter((r) => r.percent > 0)
+      .sort((a, b) => b.percent - a.percent)
+      .slice(0, 3)
+      .map((r) => r.hall.id);
+
+    return { rows, rankedIds };
   }, [halls, currency, fxRate]);
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    function update() {
+      if (!el) return;
+      const overflowing = el.scrollWidth > el.clientWidth + 2;
+      setScroll({
+        overflowing,
+        canLeft: overflowing && el.scrollLeft > 4,
+        canRight: overflowing && el.scrollLeft < el.scrollWidth - el.clientWidth - 4,
+      });
+    }
+
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(el);
+    window.addEventListener("resize", update);
+
+    return () => {
+      el.removeEventListener("scroll", update);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [computed.rows.length]);
+
+  function scrollByPage(direction: 1 | -1) {
+    scrollRef.current?.scrollBy({ left: direction * 260, behavior: "smooth" });
+  }
+
   return (
-    <div>
-      <div className="barometer-row flex gap-4 overflow-x-auto px-4 pb-4 pt-2 sm:px-0">
-        {computed.rows.map(({ hall, raised, percent }, i) => (
-          <BarometerTube
-            key={hall.id}
-            hallId={hall.id}
-            hallName={hall.name}
-            percent={percent}
-            raised={raised}
-            currency={currency}
-            isLeading={percent > 0 && percent === computed.maxPercent}
-            animIndex={i}
-            onClick={() => setSelectedHall(hall)}
+    <div className="relative">
+      {scroll.canLeft && (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-indigo-50 to-transparent"
           />
-        ))}
+          <button
+            type="button"
+            onClick={() => scrollByPage(-1)}
+            aria-label="Scroll to see earlier halls"
+            className="absolute left-2 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-900 shadow-raised transition-colors hover:bg-gold-50"
+          >
+            ‹
+          </button>
+        </>
+      )}
+
+      {scroll.canRight && (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-indigo-50 to-transparent"
+          />
+          <button
+            type="button"
+            onClick={() => scrollByPage(1)}
+            aria-label="Scroll to see more halls"
+            className="absolute right-2 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-900 shadow-raised transition-colors hover:bg-gold-50"
+          >
+            ›
+          </button>
+        </>
+      )}
+
+      <div ref={scrollRef} className="barometer-row flex gap-1.5 overflow-x-auto px-4 pb-4 pt-2 sm:px-6">
+        {computed.rows.map(({ hall, raised, percent }, i) => {
+          const rankIndex = computed.rankedIds.indexOf(hall.id);
+          const badges = [
+            ...(rankIndex >= 0 ? [`#${rankIndex + 1}`] : []),
+            ...(percent >= 100 ? ["Goal reached"] : []),
+          ];
+          return (
+            <BarometerTube
+              key={hall.id}
+              hallId={hall.id}
+              hallName={hall.name}
+              percent={percent}
+              raised={raised}
+              currency={currency}
+              badges={badges}
+              animIndex={i}
+              onClick={() => setSelectedHall(hall)}
+            />
+          );
+        })}
       </div>
 
       {selectedHall && <DonationDialog hall={selectedHall} onClose={() => setSelectedHall(null)} />}
