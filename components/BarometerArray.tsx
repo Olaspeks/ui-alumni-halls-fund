@@ -53,16 +53,7 @@ export default function BarometerArray({
       return { hall, raised, goal, percent: percentRaised(raised, goal) };
     });
 
-    // Top 3 by percentage of goal reached — not raw amount, so a small
-    // hall close to its own target can outrank a larger hall further
-    // from its own. Only halls actually making progress get ranked.
-    const rankedIds = [...rows]
-      .filter((r) => r.percent > 0)
-      .sort((a, b) => b.percent - a.percent)
-      .slice(0, 3)
-      .map((r) => r.hall.id);
-
-    return { rows, rankedIds };
+    return { rows };
   }, [halls, currency, fxRate]);
 
   useEffect(() => {
@@ -134,11 +125,7 @@ export default function BarometerArray({
 
       <div ref={scrollRef} className="barometer-row flex gap-1.5 overflow-x-auto px-4 pb-4 pt-2 sm:px-6">
         {computed.rows.map(({ hall, raised, percent }, i) => {
-          const rankIndex = computed.rankedIds.indexOf(hall.id);
-          const badges = [
-            ...(rankIndex >= 0 ? [`#${rankIndex + 1}`] : []),
-            ...(percent >= 100 ? ["Goal reached"] : []),
-          ];
+          const badges = percent >= 100 ? ["Goal reached"] : [];
           return (
             <BarometerTube
               key={hall.id}

@@ -206,7 +206,7 @@ export default function BarometerTube({
 
       <div className="w-full">
         <p className="font-mono text-xs font-bold text-indigo-950">{formatMoneyShort(raised, currency)}</p>
-        <p className="mt-0.5 line-clamp-2 text-xs font-medium leading-tight text-ink-700 group-hover:text-indigo-900">
+        <p className="mt-0.5 line-clamp-2 break-words text-[12px] font-medium leading-[15px] text-ink-700 group-hover:text-indigo-900">
           {hallName}
         </p>
       </div>
