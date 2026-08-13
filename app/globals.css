@@ -76,6 +76,17 @@
     75% { transform: translateY(5px); }
     100% { transform: translateY(0); }
   }
+
+  /* Scrolls, but no visible scrollbar chrome — the row itself (and its
+     edge-of-viewport cutoff) is the only affordance that it scrolls. */
+  .barometer-row {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge */
+  }
+
+  .barometer-row::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
 }
 
 /*

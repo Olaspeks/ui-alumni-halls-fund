@@ -49,15 +49,14 @@ export default function BarometerArray({
 
   return (
     <div>
-      <div className="flex gap-4 overflow-x-auto px-4 pb-4 pt-2 sm:px-0" style={{ scrollbarWidth: "thin" }}>
-        {computed.rows.map(({ hall, raised, goal, percent }, i) => (
+      <div className="barometer-row flex gap-4 overflow-x-auto px-4 pb-4 pt-2 sm:px-0">
+        {computed.rows.map(({ hall, raised, percent }, i) => (
           <BarometerTube
             key={hall.id}
             hallId={hall.id}
             hallName={hall.name}
             percent={percent}
             raised={raised}
-            goal={goal}
             currency={currency}
             isLeading={percent > 0 && percent === computed.maxPercent}
             animIndex={i}

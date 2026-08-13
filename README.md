@@ -56,6 +56,7 @@ to turn on — each row below is independent.
 | **Resend** | Sends the "thanks — here's your receipt" email. | Free tier generous for this volume. | [resend.com](https://resend.com) → API Keys |
 | **Cloudflare Turnstile** | Invisible bot check on the donation form. | Free. | [dash.cloudflare.com](https://dash.cloudflare.com) → Turnstile → Add site |
 | **Testnet wallet + Polygon Amoy** | The backend's server wallet that stamps confirmed totals on-chain. | Free testnet, no real funds. | See [`contracts/README.md`](./contracts/README.md) |
+| **FX rate** *(optional)* | Powers the ₦/$ toggle's combined-total conversion. | Free live rate by default, zero setup. | Nothing to sign up for — only set `FX_OVERRIDE_RATE` in `.env.local` if you want one fixed official rate instead of the live market rate. |
 
 ### Setting up Supabase (required for `/admin` and `/account`)
 

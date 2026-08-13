@@ -91,7 +91,8 @@ export default function GivingPageClient({
                 ))}
               </div>
               <p className="mt-1.5 font-mono text-[11px] text-indigo-500">
-                $1 ≈ ₦{Math.round(fxRate.usdToNgn).toLocaleString()} · live rate
+                converted at $1 ≈ ₦{Math.round(fxRate.usdToNgn).toLocaleString()}
+                {fxRate.source === "override" ? " · official rate" : fxRate.source === "fallback" ? " · estimated rate" : " · live rate"}
               </p>
             </div>
           </div>
@@ -116,12 +117,6 @@ export default function GivingPageClient({
       </section>
 
       <section className="py-10 sm:py-14">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="mb-1 flex items-baseline justify-between">
-            <h2 className="font-serif text-2xl text-indigo-950">All 15 halls</h2>
-            <p className="hidden text-xs text-ink-300 sm:block">Scroll to compare · tap a tube to give</p>
-          </div>
-        </div>
         <BarometerArray halls={halls} currency={currency} fxRate={fxRate} />
       </section>
     </>
